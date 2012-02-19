@@ -28,7 +28,7 @@ namespace lemon{namespace memory{namespace test{
 	private:
 		void MemoryPoolTest()
 		{
-			pool::allocator<65536> allocator;
+			pool::allocator<1048576> allocator;
 
 			timer_t t;
 
