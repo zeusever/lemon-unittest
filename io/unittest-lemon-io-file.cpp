@@ -1,0 +1,70 @@
+#include <sstream>
+#include <lemonxx/io/file.hpp>
+#include <lemonxx/unittest/unittest.hpp>
+
+namespace lemon{namespace io{
+
+	struct FileUnittest{};
+
+	LEMON_UNITTEST_CASE(FileUnittest,FileSystemTest)
+	{
+		std::string current = current_directory();
+
+		current_directory(current);
+
+		LEMON_CHECK(current_directory() == current);
+
+		std::string dirName = "{C3F0C7DD-A2A8-42B5-BF87-277345DE9774}";
+
+		if(exists(dirName))
+		{
+			if(is_directory(dirName)) remove_directories(dirName);
+
+			else remove_file(dirName);
+		}
+
+		create_directory(dirName);
+
+		LEMON_CHECK(exists(dirName));
+
+		const static size_t children = 100;
+
+		for(size_t i = 0; i < children ; ++ i)
+		{
+			std::ostringstream stream;
+
+			stream << "{C3F0C7DD-A2A8-42B5-BF87-277345DE9774}/" << i;
+
+			std::string currentFile = stream.str();
+
+			create_directory(currentFile);
+
+			LEMON_CHECK(exists(currentFile));
+		}
+
+		directory_iteartor_t iter(dirName);
+
+		directory_iteartor_t end;
+
+		size_t i;
+
+		for(i = 0;iter != end; ++ iter,++i)
+		{
+			if("." == *iter) continue;
+
+			if(".." == *iter) continue;
+
+			std::string path = dirName + "/" + *iter;
+
+			remove_directory(path);
+
+			LEMON_CHECK(!exists(path));
+		}
+
+		LEMON_CHECK(children == (i - 2));
+
+		remove_directory(dirName);
+
+		LEMON_CHECK(!exists(dirName));
+	}
+}}
