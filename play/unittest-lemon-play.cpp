@@ -12,7 +12,7 @@ namespace lemon{namespace concurrency{namespace test{
 	{
 		++ i;
 
-		//std::cout << "hello the play world .. " << i << std::endl;
+		std::cout << "hello the play world .. " << i << std::endl;
 	}
 
 	void Loop(atomic_t & counter,play & p)
@@ -35,8 +35,10 @@ namespace lemon{namespace concurrency{namespace test{
 
 	LEMON_UNITTEST_CASE(LemonPlayUnittest,JoinTest)
 	{
+		time_duration a,b;
+
 		{
-			play engine(2);
+			play engine(10);
 
 			atomic_t counter;
 
@@ -46,7 +48,7 @@ namespace lemon{namespace concurrency{namespace test{
 
 			engine.join();
 
-			std::cout << timer.duration() << std::endl;
+			a = timer.duration();
 		}
 
 		{
@@ -60,8 +62,10 @@ namespace lemon{namespace concurrency{namespace test{
 
 			engine.join();
 
-			std::cout << timer.duration() << std::endl;
+			b = timer.duration();
 		}
+
+		std::cout << a << ":" << b << std::endl;
 	}
 
 }}}
