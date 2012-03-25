@@ -45,4 +45,26 @@ namespace lemon{namespace test{
 		}
 
 	}
+
+	void Resc(int * i,coroutine * self)
+	{
+		std::cout << *i << std::endl;
+
+		++ *i;
+
+		coroutine child(*self,bind(&Resc,i,_0),1024);
+
+		child.resume();
+	}
+
+	LEMON_UNITTEST_CASE(CoroutineUnittest,DepthTest)
+	{
+		int i = 0;
+
+		coroutine parent;
+
+		coroutine child(parent,bind(&Resc,&i,_0),1024);
+
+		child.resume();
+	}
 }}
