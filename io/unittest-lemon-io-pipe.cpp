@@ -8,31 +8,13 @@ namespace lemon{namespace io{namespace test{
 
 	const static char * pipeName = "\\\\.\\pipe\\{F0D6858B-8888-4D0A-8F6B-997C3B1B4E36}";
 
-	void AsyncRead(size_t	/*numberOfBytesTransferred*/,const LemonErrorInfo &/*errorCode*/)
-	{
-
-	}
-
-	void AsyncWrite(size_t	/*numberOfBytesTransferred*/,const LemonErrorInfo &/*errorCode*/)
-	{
-
-	}
-
 	void SyncPipeClient()
 	{
-		io_device device;
-
-		pipe::client c(pipeName,device);
+		pipe::client c(pipeName);
 
 		const static char * message = "hello the pipe world!!!!!!!";
 
-		static char buffer[256] = {0};
-
-		c.async_read(lemon::buf(buffer),&AsyncRead);
-
-		c.write(lemon::cbuf(message));
-
-		device.run();
+		c.write(cbuf(message));
 	}
 
 	LEMON_UNITTEST_CASE(PipeUnittest,SyncPipTest)
@@ -48,8 +30,6 @@ namespace lemon{namespace io{namespace test{
 		size_t length = server.read(buf(buffer));
 
 		std::cout << std::string(buffer,buffer + length) << std::endl;
-
-		server.write(cbuf(buffer));
 
 		t.join();
 	}
