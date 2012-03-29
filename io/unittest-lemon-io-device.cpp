@@ -7,7 +7,7 @@ namespace lemon{namespace io{namespace test{
 	
 	struct IoDeviceUnittest{};
 
-	LEMON_UNITTEST_CASE(IoDeviceUnittest,BaseTest)
+	/*LEMON_UNITTEST_CASE(IoDeviceUnittest,BaseTest)
 	{
 		io_device device;
 
@@ -19,7 +19,7 @@ namespace lemon{namespace io{namespace test{
 		}
 
 		work.join();
-	}
+	}*/
 
 	void ExitCall(size_t numberOfBytesTransferred,const LemonErrorInfo &errorCode,io_device & device)
 	{
