@@ -8,13 +8,13 @@ namespace lemon{namespace io{
 
 	LEMON_UNITTEST_CASE(FileUnittest,FileSystemTest)
 	{
-		std::string current = current_directory();
+		systring current = current_directory();
 
 		current_directory(current);
 
 		LEMON_CHECK(current_directory() == current);
 
-		std::string dirName = "{C3F0C7DD-A2A8-42B5-BF87-277345DE9774}";
+		systring dirName = LEMON_TEXT("{C3F0C7DD-A2A8-42B5-BF87-277345DE9774}");
 
 		if(exists(dirName))
 		{
@@ -31,11 +31,11 @@ namespace lemon{namespace io{
 
 		for(size_t i = 0; i < children ; ++ i)
 		{
-			std::ostringstream stream;
+			sysostringstream stream;
 
 			stream << "{C3F0C7DD-A2A8-42B5-BF87-277345DE9774}/" << i;
 
-			std::string currentFile = stream.str();
+			systring currentFile = stream.str();
 
 			create_directory(currentFile);
 
@@ -50,11 +50,11 @@ namespace lemon{namespace io{
 
 		for(i = 0;iter != end; ++ iter,++i)
 		{
-			if("." == *iter) continue;
+			if(LEMON_TEXT(".") == *iter) continue;
 
-			if(".." == *iter) continue;
+			if(LEMON_TEXT("..") == *iter) continue;
 
-			std::string path = dirName + "/" + *iter;
+			systring path = dirName + LEMON_TEXT("/") + *iter;
 
 			remove_directory(path);
 
