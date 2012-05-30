@@ -1,7 +1,7 @@
 #include <lemonxx/sys/filesystem.hpp>
 #include <lemonxx/unittest/unittest.hpp>
 
-namespace lemon{namespace test{
+namespace lemon{namespace fs{namespace test{
 
 	struct FileSystemUnittest{};
 
@@ -67,4 +67,4 @@ namespace lemon{namespace test{
 		LEMON_CHECK(!exists(dirName));
 	}
 
-}}
+}}}
