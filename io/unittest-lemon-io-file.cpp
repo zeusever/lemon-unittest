@@ -1,12 +1,11 @@
 #include <sstream>
-#include <lemonxx/io/file.hpp>
 #include <lemonxx/unittest/unittest.hpp>
 
 namespace lemon{namespace io{
 
 	struct FileUnittest{};
 
-	LEMON_UNITTEST_CASE(FileUnittest,FileSystemTest)
+	/*LEMON_UNITTEST_CASE(FileUnittest,FileSystemTest)
 	{
 		String current = current_directory();
 
@@ -66,5 +65,5 @@ namespace lemon{namespace io{
 		remove_directory(dirName);
 
 		LEMON_CHECK(!exists(dirName));
-	}
+	}*/
 }}
