@@ -250,4 +250,22 @@ namespace lemon{namespace test{
 		LEMON_CHECK(LEMON_SUCCESS(errorCode));
 	}
 
+	void Increase(atomic_t & i)
+	{
+		++ i;
+	}
+
+	LEMON_UNITTEST_CASE(LemonThreadUnittest,thread_group_test)
+	{
+		atomic_t i;
+
+		thread_group group;
+
+		group.start(lemon::bind(&Increase,ref(i)),20);
+
+		group.join();
+
+		LEMON_CHECK(group.size() == i);
+	}
+
 }}
