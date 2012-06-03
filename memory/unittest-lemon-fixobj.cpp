@@ -12,7 +12,7 @@ namespace lemon{namespace memory{namespace test{
 	template<size_t BlockSize,size_t MaxLoops = 100>
 	struct MemoryAllocUnittest
 	{
-	public:
+	public: 
 		void Run()
 		{
 			MemoryPoolTest();
