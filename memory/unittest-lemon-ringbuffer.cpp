@@ -6,21 +6,26 @@ namespace lemon{namespace memory{namespace test{
 
 	LEMON_UNITTEST_CASE(RingBufferUnittest,ContructorTest)
 	{
-		ringbuffer::allocator<sizeof(size_t),3> alloc;
+		ringbuffer::allocator<sizeof(size_t),1024> alloc;
 
-		size_t capacity = 0;
+		size_t length = 0;
 
-		while(0 != (capacity = alloc.capacity()))
+		while(alloc.capacity() != (length = alloc.length()))
 		{
-			LEMON_CHECK(alloc.push_front(&capacity,sizeof(size_t)) == 0);
+			LEMON_CHECK(alloc.push_front(&length,sizeof(size_t)) == 0);
 		}
 
-		void * block  = alloc.push_front(&capacity,sizeof(size_t));
+		for(size_t i = 0; i < alloc.capacity(); ++ i)
+		{
+			void * block  = alloc.push_front(&length,sizeof(size_t));
 
-		LEMON_CHECK(0 != block);
+			LEMON_CHECK(0 != block);
 
-		memcpy(&capacity,block,sizeof(capacity));
+			memcpy(&length,block,sizeof(length));
 
-		LEMON_CHECK(1 == capacity);
+			LEMON_CHECK(i == length);
+		}
+
+		
 	}
 }}}
