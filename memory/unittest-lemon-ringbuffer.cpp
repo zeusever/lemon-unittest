@@ -6,7 +6,7 @@ namespace lemon{namespace memory{namespace test{
 
 	LEMON_UNITTEST_CASE(RingBufferUnittest,ContructorTest)
 	{
-		ringbuffer::allocator<sizeof(size_t),1024> alloc;
+		ringbuffer::allocator<sizeof(size_t)> alloc(1024);
 
 		size_t length = 0;
 
@@ -26,6 +26,17 @@ namespace lemon{namespace memory{namespace test{
 			LEMON_CHECK(i == length);
 		}
 
-		
+		for(size_t i = 0; i < alloc.capacity(); ++ i)
+		{
+			void * block  = alloc.pop_back();
+
+			LEMON_CHECK(0 != block);
+
+			memcpy(&length,block,sizeof(length));
+
+			LEMON_CHECK(i == length);
+		}
+
+		LEMON_CHECK(alloc.length() == 0);
 	}
 }}}
