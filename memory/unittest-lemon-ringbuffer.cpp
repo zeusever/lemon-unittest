@@ -8,6 +8,8 @@ namespace lemon{namespace memory{namespace test{
 	{
 		ringbuffer::allocator<sizeof(size_t)> alloc(1024);
 
+		ringbuffer::allocator<sizeof(size_t)>::iterator front,end;
+
 		size_t length = 0;
 
 		while(alloc.capacity() != (length = alloc.length()))
@@ -24,6 +26,29 @@ namespace lemon{namespace memory{namespace test{
 			memcpy(&length,block,sizeof(length));
 
 			LEMON_CHECK(i == length);
+		}
+		
+		front = alloc.front();
+
+		end = alloc.back();
+
+		-- end;
+
+		size_t i = 0;
+
+		while(front != end)
+		{
+			const void * block  = *front;
+
+			LEMON_CHECK(0 != block);
+
+			memcpy(&length,block,sizeof(length));
+
+			LEMON_CHECK(i == length);
+
+			++ i;
+
+			++ front;
 		}
 
 		for(size_t i = 0; i < alloc.capacity(); ++ i)
