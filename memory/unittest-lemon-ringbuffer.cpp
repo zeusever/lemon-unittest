@@ -8,8 +8,6 @@ namespace lemon{namespace memory{namespace test{
 	{
 		ringbuffer::allocator<sizeof(size_t)> alloc(1024);
 
-		ringbuffer::allocator<sizeof(size_t)>::iterator front,end;
-
 		size_t length = 0;
 
 		while(alloc.capacity() != (length = alloc.length()))
@@ -27,29 +25,6 @@ namespace lemon{namespace memory{namespace test{
 
 			LEMON_CHECK(i == length);
 		}
-		
-		front = alloc.front();
-
-		end = alloc.back();
-
-		-- end;
-
-		size_t i = 0;
-
-		while(front != end)
-		{
-			const void * block  = *front;
-
-			LEMON_CHECK(0 != block);
-
-			memcpy(&length,block,sizeof(length));
-
-			LEMON_CHECK(i == length);
-
-			++ i;
-
-			++ front;
-		}
 
 		for(size_t i = 0; i < alloc.capacity(); ++ i)
 		{
@@ -63,5 +38,40 @@ namespace lemon{namespace memory{namespace test{
 		}
 
 		LEMON_CHECK(alloc.length() == 0);
+	}
+
+	LEMON_UNITTEST_CASE(RingBufferUnittest,IteratorTest)
+	{
+		typedef ringbuffer::allocator<sizeof(size_t),3> allocator_type;
+
+		allocator_type alloc(3);
+
+		LEMON_CHECK(alloc.capacity() == 3);
+
+		size_t length = alloc.length();
+
+		alloc.push_back(&length,sizeof(length));
+
+		length = alloc.length();
+
+		alloc.push_back(&length,sizeof(length));
+
+		length = alloc.length();
+
+		alloc.push_back(&length,sizeof(length));
+
+		LEMON_CHECK(alloc.length() == 3);
+
+		memcpy(&length,*alloc.front(),sizeof(length));
+
+		LEMON_CHECK(length == 0);
+
+		memcpy(&length,*alloc.back(),sizeof(length));
+
+		LEMON_CHECK(length == 2);
+
+		LEMON_CHECK(++ alloc.front() == -- alloc.back());
+
+		LEMON_CHECK(++ alloc.back() == alloc.end());
 	}
 }}}
