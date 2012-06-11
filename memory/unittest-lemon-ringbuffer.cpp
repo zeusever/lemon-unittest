@@ -42,19 +42,23 @@ namespace lemon{namespace memory{namespace test{
 
 	LEMON_UNITTEST_CASE(RingBufferUnittest,IteratorTest)
 	{
-		typedef ringbuffer::allocator<sizeof(size_t),3> allocator_type;
+		typedef ringbuffer::allocator<sizeof(size_t),10> allocator_type;
 
 		allocator_type alloc(3);
 
-		LEMON_CHECK(alloc.capacity() == 3);
+		//LEMON_CHECK(alloc.capacity() == 3);
 
 		size_t length = alloc.length();
 
 		alloc.push_back(&length,sizeof(length));
 
+		LEMON_CHECK(alloc.length() == 1);
+
 		length = alloc.length();
 
 		alloc.push_back(&length,sizeof(length));
+
+		LEMON_CHECK(alloc.length() == 2);
 
 		length = alloc.length();
 
