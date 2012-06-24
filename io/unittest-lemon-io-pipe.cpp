@@ -23,6 +23,8 @@ namespace lemon{namespace io{namespace test{
 
 		lemon::thread_t t(&SyncPipeClient);
 
+		lemon::thread_t t2(&SyncPipeClient);
+
 		server.accept();
 
 		byte_t buffer[256];
@@ -31,6 +33,14 @@ namespace lemon{namespace io{namespace test{
 
 		std::cout << std::string(buffer,buffer + length) << std::endl;
 
+		server.accept();
+
+		length = server.read(buf(buffer));
+
+		std::cout << std::string(buffer,buffer + length) << std::endl;
+
 		t.join();
+
+		t2.join();
 	}
 }}}
