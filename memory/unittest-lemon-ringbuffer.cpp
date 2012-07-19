@@ -1,3 +1,4 @@
+#include <iomanip>
 #include <lemonxx/unittest/unittest.hpp>
 #include <lemonxx/memory/ringbuffer.hpp>
 
@@ -77,5 +78,34 @@ namespace lemon{namespace memory{namespace test{
 		LEMON_CHECK(++ alloc.front() == -- alloc.back());
 
 		LEMON_CHECK(++ alloc.back() == alloc.end());
+	}
+
+	LEMON_UNITTEST_CASE(RingBufferUnittest,Performance)
+	{
+		typedef ringbuffer::allocator<sizeof(size_t),10> allocator_type;
+
+
+		allocator_type alloc(1000000);
+
+		
+
+		for(size_t i = 0; i < alloc.capacity(); ++ i)
+		{
+			size_t length = alloc.length();
+
+			alloc.push_front(&length,sizeof(length));
+		}
+
+		allocator_type::const_iterator iter = alloc.front(),end = alloc.end();
+
+		lemon::timer_t timer;
+
+		while(iter != end) ++ iter;
+
+		
+
+		lemon::time_duration duration = timer.duration();
+
+		std::cout << "\t use times: " <<   duration / 10000000 << "." << std::setw(6) << std::setfill('0') <<(duration % 10000000) / 10 << " seconds."<<std::endl;
 	}
 }}}
