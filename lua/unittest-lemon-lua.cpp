@@ -107,7 +107,7 @@ namespace lemon{namespace luabind{namespace test{
 
 			script += "/unittest-lemon-lua-call.lua";
 
-			L.dofile(script);
+			dofile(L,script);
 		}
 
 		size_t counter;
