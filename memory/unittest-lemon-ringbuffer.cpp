@@ -82,12 +82,13 @@ namespace lemon{namespace memory{namespace test{
 
 	LEMON_UNITTEST_CASE(RingBufferUnittest,Performance)
 	{
-		typedef ringbuffer::allocator<sizeof(size_t),10> allocator_type;
+		size_t i[100] = {0};
+
+		typedef ringbuffer::allocator<sizeof(i),10> allocator_type;
 
 
 		allocator_type alloc(1000000);
 
-		
 
 		for(size_t i = 0; i < alloc.capacity(); ++ i)
 		{
@@ -100,7 +101,12 @@ namespace lemon{namespace memory{namespace test{
 
 		lemon::timer_t timer;
 
-		while(iter != end) ++ iter;
+		while(iter != end)
+		{
+			++ iter;
+
+			memcmp(&i,*iter,sizeof(i));
+		}
 
 		
 
