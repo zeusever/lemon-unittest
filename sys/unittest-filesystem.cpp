@@ -67,4 +67,71 @@ namespace lemon{namespace fs{namespace test{
 		LEMON_CHECK(!exists(dirName));
 	}
 
+	LEMON_UNITTEST_CASE(FileSystemUnittest,path_test)
+	{
+		fs::path win32Path1(LEMON_TEXT("c:\\test.txt"));
+
+		fs::path win32Path2(LEMON_TEXT(".\\test.txt"));
+
+		fs::path unixPath1(LEMON_TEXT("./test.txt"));
+
+		fs::path unixPath2(LEMON_TEXT("/test/../a/./../test.txt"));
+
+		LEMON_CHECK(win32Path1.root() == LEMON_TEXT("c:"));
+
+		LEMON_CHECK(win32Path2.root() == LEMON_TEXT("."));
+
+		LEMON_CHECK(unixPath1.root() == LEMON_TEXT("."));
+
+		LEMON_CHECK(win32Path1.begin() != win32Path1.end());
+
+		LEMON_CHECK(*win32Path1.begin()  ==  LEMON_TEXT("test.txt"));
+
+		LEMON_CHECK(unixPath1.leaf()  ==  LEMON_TEXT("test.txt"));
+
+		LEMON_CHECK(win32Path2.has_leaf());
+
+		LEMON_CHECK(win32Path2.relative_path());
+
+		LEMON_CHECK(unixPath1.relative_path());
+
+		LEMON_CHECK(extension(unixPath1) == LEMON_TEXT("txt"));
+		
+		unixPath2.compress();
+
+		LEMON_CHECK(unixPath2.string() == LEMON_TEXT("/test.txt"));
+
+		{
+			fs::path a(LEMON_TEXT("/a/"));
+
+			fs::path b(LEMON_TEXT("/a/b"));
+
+			LEMON_CHECK(relative(a,b) == fs::path(LEMON_TEXT("./b")));
+		}
+
+		{
+			fs::path a(LEMON_TEXT("/a/c/d"));
+
+			fs::path b(LEMON_TEXT("/a/b"));
+
+			LEMON_CHECK(relative(a,b) == fs::path(LEMON_TEXT("../../b")));
+		}
+
+		{
+			fs::path a(LEMON_TEXT("c:/a/c/d"));
+
+			fs::path b(LEMON_TEXT("c:/a/b"));
+
+			LEMON_CHECK(relative(a,b) == fs::path(LEMON_TEXT("../../b")));
+		}
+
+		{
+			fs::path a(LEMON_TEXT("c:/a/c/d"));
+
+			fs::path b(LEMON_TEXT("d:/a/b"));
+
+			LEMON_CHECK(relative(a,b) == fs::path());
+		}
+	}
+
 }}}
