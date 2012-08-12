@@ -1,7 +1,7 @@
 assembly = 
    {
    -- the project name
-   name = "unittest-lemon-trace";
+   name = "unittest-lemon-diagnosis";
 
    description = "the lemon sys library";
 
