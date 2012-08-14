@@ -41,7 +41,7 @@ namespace lemon{namespace dtrace{namespace test{
 
 		LemonDTraceFlags flags;
 
-		flags.S.Catalog = LEMON_SYS_FILESYSTEM | LEMON_SYS_COROUTINE;
+		flags.S.Catalog = UNITTEST_LEMON_DIAGNOSIS_FILESYSTEM | UNITTEST_LEMON_DIAGNOSIS_COROUTINE;
 
 		flags.S.Level = LEMON_TRACELOG_DEBUG;
 
@@ -73,13 +73,17 @@ namespace lemon{namespace dtrace{namespace test{
 
 		LemonDTraceFlags flags;
 
-		flags.S.Catalog = LEMON_SYS_FILESYSTEM | LEMON_SYS_COROUTINE;
+		flags.S.Catalog = UNITTEST_LEMON_DIAGNOSIS_FILESYSTEM | UNITTEST_LEMON_DIAGNOSIS_COROUTINE;
 
 		flags.S.Level = LEMON_TRACELOG_DEBUG;
 
 		C.open_trace(&UNITTEST_LEMON_DIAGNOSIS_GUID,flags);
 
 		provider    P(S,&UNITTEST_LEMON_DIAGNOSIS_GUID);
+
+		error_info errorCode;
+
+		LEMON_USER_ERROR(errorCode,LEMON_SYS_BUFFER_TOO_SMALL);
 
 		for(size_t i = 0; i < counter; ++  i)
 		{
@@ -88,6 +92,43 @@ namespace lemon{namespace dtrace{namespace test{
 			LEMON_CHECK(message.want());
 
 			message.write_rawdata(lemon::cbuf("hello the world "));
+
+			//message.write_errorinfo(errorCode);
+		}	
+	}
+
+
+	LEMON_UNITTEST_CASE(DTraceUnittest,PerformanceOnTest1)
+	{
+		size_t counter = 100000;
+
+		service		S;
+
+		controller  C(S);
+
+		LemonDTraceFlags flags;
+
+		flags.S.Catalog = UNITTEST_LEMON_DIAGNOSIS_FILESYSTEM | UNITTEST_LEMON_DIAGNOSIS_COROUTINE;
+
+		flags.S.Level = LEMON_TRACELOG_DEBUG;
+
+		C.open_trace(&UNITTEST_LEMON_DIAGNOSIS_GUID,flags);
+
+		provider    P(S,&UNITTEST_LEMON_DIAGNOSIS_GUID);
+
+		error_info errorCode;
+
+		LEMON_USER_ERROR(errorCode,LEMON_SYS_BUFFER_TOO_SMALL);
+
+		for(size_t i = 0; i < counter; ++  i)
+		{
+			commit_message message(P,flags);
+
+			LEMON_CHECK(message.want());
+
+			//message.write_rawdata(lemon::cbuf("hello the world "));
+
+			message.write_errorinfo(errorCode);
 		}	
 	}
 
@@ -97,7 +138,7 @@ namespace lemon{namespace dtrace{namespace test{
 
 		LemonDTraceFlags flags;
 
-		flags.S.Catalog = LEMON_SYS_FILESYSTEM | LEMON_SYS_COROUTINE;
+		flags.S.Catalog = UNITTEST_LEMON_DIAGNOSIS_FILESYSTEM |UNITTEST_LEMON_DIAGNOSIS_COROUTINE;
 
 		flags.S.Level = LEMON_TRACELOG_DEBUG;
 
@@ -118,7 +159,7 @@ namespace lemon{namespace dtrace{namespace test{
 	{
 		LemonDTraceFlags flags;
 
-		flags.S.Catalog = LEMON_SYS_FILESYSTEM | LEMON_SYS_COROUTINE;
+		flags.S.Catalog = UNITTEST_LEMON_DIAGNOSIS_FILESYSTEM | UNITTEST_LEMON_DIAGNOSIS_COROUTINE;
 
 		flags.S.Level = LEMON_TRACELOG_DEBUG;
 
@@ -140,13 +181,19 @@ namespace lemon{namespace dtrace{namespace test{
 
 		cm.write_userdata(lemon::cbuf(buffer));
 
+		error_info errorCode;
+
+		LEMON_USER_ERROR(errorCode,LEMON_SYS_BUFFER_TOO_SMALL);
+
+		cm.write_errorinfo(errorCode);
+
 		message reader(cm);
 
 		LEMON_CHECK(true == reader.read_boolean());
 
 		LEMON_CHECK(false == reader.read_boolean());
 
-		LEMON_CHECK(12345 == reader.read_integer());
+		LEMON_CHECK(12345 == reader.read_number());
 
 		LEMON_CHECK(reader.read_utf8_string() == "hello world !!!");
 
@@ -158,6 +205,18 @@ namespace lemon{namespace dtrace{namespace test{
 		{
 			LEMON_CHECK(buffer[i] == i);
 		}
+
+		error_info errorCode1;
+
+		char buffer1[256];
+
+		reader.read_errorinfo(errorCode1,lemon::buf(buffer1));
+
+		LEMON_CHECK(errorCode1.Lines == errorCode.Lines);
+
+		LEMON_CHECK(errorCode1.Error.Code == errorCode.Error.Code);
+
+		LEMON_CHECK(memcmp(errorCode.Error.Catalog,errorCode1.Error.Catalog,sizeof(LemonUuid)) == 0);
 	}
 
 	void Hello2(lemon::mutex_t & mutex,condition_variable & cv,const message & e)
@@ -174,7 +233,7 @@ namespace lemon{namespace dtrace{namespace test{
 
 		LEMON_CHECK(LEMON_DTRACE_INTEGER == e.type());
 
-		LEMON_CHECK(12345 == e.read_integer());
+		LEMON_CHECK(12345 == e.read_number());
 
 		LEMON_CHECK(LEMON_DTRACE_UTF8_STRING == e.type());
 
@@ -206,7 +265,7 @@ namespace lemon{namespace dtrace{namespace test{
 
 		LemonDTraceFlags flags;
 
-		flags.S.Catalog = LEMON_SYS_FILESYSTEM | LEMON_SYS_COROUTINE;
+		flags.S.Catalog = UNITTEST_LEMON_DIAGNOSIS_FILESYSTEM | UNITTEST_LEMON_DIAGNOSIS_COROUTINE;
 
 		flags.S.Level = LEMON_TRACELOG_DEBUG;
 
@@ -239,7 +298,7 @@ namespace lemon{namespace dtrace{namespace test{
 	{
 		LEMON_CHECK(e.read_utf8_string() == "lemon::dtrace");
 
-		LEMON_CHECK(e.read_integer() == 123);
+		LEMON_CHECK(e.read_number() == 123);
 		
 		lemon::mutex_t::scope_lock lock(mutex);
 
@@ -256,7 +315,7 @@ namespace lemon{namespace dtrace{namespace test{
 
 		LemonDTraceFlags flags;
 
-		flags.S.Catalog = LEMON_SYS_FILESYSTEM | LEMON_SYS_COROUTINE;
+		flags.S.Catalog = UNITTEST_LEMON_DIAGNOSIS_FILESYSTEM | UNITTEST_LEMON_DIAGNOSIS_COROUTINE;
 
 		flags.S.Level = LEMON_TRACELOG_DEBUG;
 
@@ -266,7 +325,7 @@ namespace lemon{namespace dtrace{namespace test{
 
 		consumer cs(C,lemon::bind(&Hello3,lemon::ref(mutex),lemon::ref(cv),lemon::_0));
 
-		LEMON_SYS_TRACE(Context()->Provider,LEMON_TRACELOG_DEBUG,LEMON_SYS_FILESYSTEM,"Hello world ,{0},{1}" ,"lemon::dtrace",123);
+		LEMON_SYS_TRACE(Context()->Provider,LEMON_TRACELOG_DEBUG,UNITTEST_LEMON_DIAGNOSIS_FILESYSTEM,"Hello world ,{0},{1}" ,"lemon::dtrace",123);
 
 		cv.wait(lock);
 	}

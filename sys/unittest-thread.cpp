@@ -265,7 +265,7 @@ namespace lemon{namespace test{
 
 		group.join();
 
-		LEMON_CHECK(group.size() == i);
+		LEMON_CHECK(group.size() == (size_t)i);
 	}
 
 }}

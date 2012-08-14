@@ -17,13 +17,13 @@ assembly =
 		catalog = 
 		{
 			{
-				name = "LEMON_SYS_FILESYSTEM";
+				name = "FILESYSTEM";
 
 				description = "filesytem trace";
 			};
 
 			{
-				name = "LEMON_SYS_COROUTINE";
+				name = "COROUTINE";
 
 				description = "coruinte trace";
 			};
