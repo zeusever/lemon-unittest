@@ -11,7 +11,7 @@
 #include <iostream>
 namespace lemon{namespace io{namespace test{
 
-	struct SocketUnittest{};
+	/*struct SocketUnittest{};
 
 	void Client(ip::endpoint remote)
 	{
@@ -47,7 +47,7 @@ namespace lemon{namespace io{namespace test{
 
 			tuple<ip::tcp::connection::handle_type,ip::endpoint> result = s.accept();
 
-			ip::tcp::connection conn = get<0>(result);
+			ip::tcp::connection conn(get<0>(result));
 
 			ip::endpoint ep = get<1>(result);
 
@@ -391,6 +391,6 @@ namespace lemon{namespace io{namespace test{
 
 			device.run();
 		}
-	}
+	}*/
 
 }}}

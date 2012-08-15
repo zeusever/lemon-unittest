@@ -170,10 +170,12 @@ namespace lemon{namespace luabind{namespace test{
 	{
 		lua_state L;
 
-		const static size_t counter = 2500000;
+		size_t counter;
 
 		lua_class_bind_unittest()
 		{
+			counter = 2500000;
+
 			std::string file = UNITTEST_LEMON_LUA_SRC;
 
 			file += "/unittest-lemon-lua-call.lua";
