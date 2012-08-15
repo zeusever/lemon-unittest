@@ -8,11 +8,11 @@ namespace lemon{namespace test{
 
 	LEMON_UNITTEST_CASE(DateTimeUnittest,time_tTest)
 	{
-		time_t t1;
+		time_t t1 = time_t::now();
 
 		for(size_t i = 0; i < 100; ++ i) std::cout << "time duration..." << std::endl;
 
-		time_t t2;
+		time_t t2 = time_t::now();
 
 		time_t t3  = t2;
 
@@ -36,7 +36,7 @@ namespace lemon{namespace test{
 
 	LEMON_UNITTEST_CASE(DateTimeUnittest,datetimeTest)
 	{
-		time_t t;
+		time_t t = time_t::now();
 
 		localtime_t local(t);
 
