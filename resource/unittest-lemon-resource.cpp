@@ -139,4 +139,83 @@ namespace lemon{namespace resource{namespace test{
 
 		LEMON_CHECK(info.Description == NULL);
 	}
+
+	class MemeoryReader : public IReader
+	{
+	public:
+		MemeoryReader(std::vector<byte_t> & buffer):_offset(0),_buffer(buffer){}
+
+		void Read(lemon::byte_t * data,size_t datalength)
+		{
+			memcpy(data,&_buffer[_offset],datalength);
+
+			_offset += datalength;
+		}
+
+	private:
+
+		size_t				_offset;
+
+		std::vector<byte_t> & _buffer;
+	};
+
+	class MemeoryWriter : public IWriter
+	{
+	public:
+		MemeoryWriter(std::vector<byte_t> & buffer):_buffer(buffer){}
+
+		void Write(const lemon::byte_t * data,size_t datalength)
+		{
+			_buffer.insert(_buffer.end(),data,data + datalength);
+		}
+
+	private:
+
+		std::vector<byte_t> & _buffer;
+	};
+
+	LEMON_UNITTEST_CASE(PackageUnittest,ReadWriterTest)
+	{
+		std::vector<byte_t> buffer;
+
+		{
+			Package package;
+
+			package.NewErrorMessage(1,LEMON_TEXT("Hello world1"),NULL,LEMON_TEXT("zh_CN"));
+
+			package.NewTraceCatalog(1,LEMON_TEXT("Hello world"),LEMON_TEXT("Hello world"),LEMON_TEXT("zh_CN"));
+
+			package.NewErrorMessage(1,LEMON_TEXT("Hello world"),NULL,LEMON_TEXT("zh_TW"));
+
+			package.NewTraceCatalog(1,LEMON_TEXT("Hello world"),LEMON_TEXT("Hello world"),LEMON_TEXT("zh_TW"));
+
+			package.NewText(LEMON_TEXT("Hello world"),LEMON_TEXT("Hello world~~~~~~~~~`"),LEMON_TEXT("zh_TW"));
+
+			MemeoryWriter writer(buffer);
+
+			package.Write(writer);
+		}
+
+		{
+			Package package;
+
+			MemeoryReader reader(buffer);
+
+			package.Read(reader);
+
+			LemonResourceInfo  info = package.GetErrorMessage(1,LEMON_TEXT("zh_CN"));
+
+			LEMON_CHECK(lemon::String(info.Name) == LEMON_TEXT("Hello world1"));
+
+			LEMON_CHECK(info.Description == NULL);
+
+			LEMON_CHECK(lemon::String(package.GetText(LEMON_TEXT("Hello world"),LEMON_TEXT("zh_TW"))) == LEMON_TEXT("Hello world~~~~~~~~~`"));
+
+			info = package.GetTraceCatalog(1,LEMON_TEXT("zh_CN"));
+
+			LEMON_CHECK(lemon::String(info.Name) == LEMON_TEXT("Hello world"));
+
+			LEMON_CHECK(lemon::String(info.Description) == LEMON_TEXT("Hello world"));
+		}
+	}
 }}}
