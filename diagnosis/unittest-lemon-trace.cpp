@@ -44,7 +44,7 @@ namespace lemon{namespace dtrace{namespace test{
 
 		flags.S.Catalog = UNITTEST_LEMON_DIAGNOSIS_FILESYSTEM | UNITTEST_LEMON_DIAGNOSIS_COROUTINE;
 
-		flags.S.Level = LEMON_TRACELOG_DEBUG;
+		flags.S.Level = LEMON_TL_DEBUG;
 
 		controller c(Context()->Service);
 
@@ -76,7 +76,7 @@ namespace lemon{namespace dtrace{namespace test{
 
 		flags.S.Catalog = UNITTEST_LEMON_DIAGNOSIS_FILESYSTEM | UNITTEST_LEMON_DIAGNOSIS_COROUTINE;
 
-		flags.S.Level = LEMON_TRACELOG_DEBUG;
+		flags.S.Level = LEMON_TL_DEBUG;
 
 		C.open_trace(&UNITTEST_LEMON_DIAGNOSIS_GUID,flags);
 
@@ -111,7 +111,7 @@ namespace lemon{namespace dtrace{namespace test{
 
 	//	flags.S.Catalog = UNITTEST_LEMON_DIAGNOSIS_FILESYSTEM | UNITTEST_LEMON_DIAGNOSIS_COROUTINE;
 
-	//	flags.S.Level = LEMON_TRACELOG_DEBUG;
+	//	flags.S.Level = LEMON_TL_DEBUG;
 
 	//	C.open_trace(&UNITTEST_LEMON_DIAGNOSIS_GUID,flags);
 
@@ -141,7 +141,7 @@ namespace lemon{namespace dtrace{namespace test{
 
 	//	flags.S.Catalog = UNITTEST_LEMON_DIAGNOSIS_FILESYSTEM |UNITTEST_LEMON_DIAGNOSIS_COROUTINE;
 
-	//	flags.S.Level = LEMON_TRACELOG_DEBUG;
+	//	flags.S.Level = LEMON_TL_DEBUG;
 
 	//	//C.open_trace(&UNITTEST_LEMON_DIAGNOSIS_GUID,flags);
 
@@ -162,7 +162,7 @@ namespace lemon{namespace dtrace{namespace test{
 
 	//	flags.S.Catalog = UNITTEST_LEMON_DIAGNOSIS_FILESYSTEM | UNITTEST_LEMON_DIAGNOSIS_COROUTINE;
 
-	//	flags.S.Level = LEMON_TRACELOG_DEBUG;
+	//	flags.S.Level = LEMON_TL_DEBUG;
 
 	//	controller  C(Context()->Service);
 
@@ -268,7 +268,7 @@ namespace lemon{namespace dtrace{namespace test{
 
 	//	flags.S.Catalog = UNITTEST_LEMON_DIAGNOSIS_FILESYSTEM | UNITTEST_LEMON_DIAGNOSIS_COROUTINE;
 
-	//	flags.S.Level = LEMON_TRACELOG_DEBUG;
+	//	flags.S.Level = LEMON_TL_DEBUG;
 
 	//	controller  C(Context()->Service);
 
@@ -342,7 +342,7 @@ namespace lemon{namespace dtrace{namespace test{
 
 		flags.S.Catalog = UNITTEST_LEMON_DIAGNOSIS_FILESYSTEM | UNITTEST_LEMON_DIAGNOSIS_COROUTINE;
 
-		flags.S.Level = LEMON_TRACELOG_DEBUG;
+		flags.S.Level = LEMON_TL_DEBUG;
 
 		controller  C(Context()->Service);
 
@@ -357,7 +357,7 @@ namespace lemon{namespace dtrace{namespace test{
 		lemon::io::ip::endpoint ep = lemon::io::resolver_iterator("localhost","1812")->ai_addr;
 
 		LEMON_SYS_TRACE(Context()->Provider,
-			LEMON_TRACELOG_DEBUG,UNITTEST_LEMON_DIAGNOSIS_FILESYSTEM,
+			LEMON_TL_DEBUG,UNITTEST_LEMON_DIAGNOSIS_FILESYSTEM,
 			"Hello world ,{0},{1}" ,
 			"lemon::dtrace",123,
 			errorCode,
