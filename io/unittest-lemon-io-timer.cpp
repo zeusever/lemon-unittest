@@ -9,7 +9,7 @@ namespace lemon{namespace io{namespace test{
 
 	void Callback(lemon::condition_variable & cv,lemon::mutex_t & mutex,size_t &counter)
 	{
-		if(counter < 1000000)
+		if(counter < 4)
 		{
 			std::cout << "time out" << std::endl;
 

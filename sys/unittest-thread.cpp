@@ -72,7 +72,7 @@ namespace lemon{namespace test{
 
 		for(size_t i = 0; i < 10; ++ i)
 		{
-			LEMON_DECLARE_ERRORINFO(errorCode);
+			error_info errorCode;
 
 			LemonThread t = LemonCreateThread(&TlsDestructorPoc,&context,&errorCode);
 
@@ -92,7 +92,7 @@ namespace lemon{namespace test{
 
 	/*LEMON_UNITTEST_CASE(LemonThreadUnittest,ThreadTextEncodingTest)
 	{
-		LEMON_DECLARE_ERRORINFO(errorCode);
+		error_info errorCode;
 
 		LemonTextEncoding ec = LemonGetThreadTextEncoding(&errorCode);
 
@@ -133,7 +133,7 @@ namespace lemon{namespace test{
 
 		for(size_t i = 0; i < maxThreads; ++ i)
 		{
-			LEMON_DECLARE_ERRORINFO(errorCode);
+			error_info errorCode;
 
 			threads[i] = LemonCreateThread(&MutexTestProc,&context,&errorCode);
 
@@ -144,7 +144,7 @@ namespace lemon{namespace test{
 
 		for(size_t i = 0; i < maxThreads; ++ i)
 		{
-			LEMON_DECLARE_ERRORINFO(errorCode);
+			error_info errorCode;
 
 			LemonThreadJoin(threads[i],&errorCode);
 
@@ -180,7 +180,7 @@ namespace lemon{namespace test{
 
 		for(size_t i = 0; i < maxThreads; ++ i)
 		{
-			LEMON_DECLARE_ERRORINFO(errorCode);
+			error_info errorCode;
 
 			threads[i] = LemonCreateThread(&AtomicOperator,&atomic,&errorCode);
 
@@ -191,7 +191,7 @@ namespace lemon{namespace test{
 
 		for(size_t i = 0; i < maxThreads; ++ i)
 		{
-			LEMON_DECLARE_ERRORINFO(errorCode);
+			error_info errorCode;
 
 			LemonThreadJoin(threads[i],&errorCode);
 
@@ -232,7 +232,7 @@ namespace lemon{namespace test{
 
 		context.entry = false;
 
-		LEMON_DECLARE_ERRORINFO(errorCode);
+		error_info errorCode;
 
 		LemonThread t  = LemonCreateThread(&Notify,&context,&errorCode);
 

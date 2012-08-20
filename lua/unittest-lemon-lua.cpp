@@ -25,7 +25,7 @@ namespace lemon{namespace luabind{namespace test{
 
 	LEMON_UNITTEST_CASE(lstate_unittest,bind_performance_test)
 	{
-		size_t counter = 2500000;
+		size_t counter = 2500;
 
 		lua_state L(luaL_newstate());
 
@@ -37,7 +37,7 @@ namespace lemon{namespace luabind{namespace test{
 
 	LEMON_UNITTEST_CASE(lstate_unittest,compare_test)
 	{
-		size_t counter = 2500000;
+		size_t counter = 2500;
 
 		lua_state L(luaL_newstate());
 
@@ -174,7 +174,7 @@ namespace lemon{namespace luabind{namespace test{
 
 		lua_class_bind_unittest()
 		{
-			counter = 2500000;
+			counter = 25000;
 
 			std::string file = UNITTEST_LEMON_LUA_SRC;
 

@@ -12,7 +12,7 @@ namespace lemon{namespace concurrency{namespace test{
 	{
 		++ i;
 
-		std::cout << "hello the play world .. " << i << std::endl;
+		//std::cout << "hello the play world .. " << i << std::endl;
 	}
 
 	void Loop(atomic_t & counter,play & p)

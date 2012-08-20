@@ -167,7 +167,7 @@ namespace lemon{namespace io{namespace test{
 
 		char buffer[256];
 
-		LEMON_DECLARE_ERRORINFO(errorCode);
+		error_info errorCode;
 
 		size_t length = LemonAddressToString(AF_INET,&address,sizeof(address),buffer,sizeof(buffer),&errorCode);
 
