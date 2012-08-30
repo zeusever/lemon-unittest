@@ -9,7 +9,7 @@ namespace lemon{namespace memory{namespace test{
 
 	struct LemonFixObjectAllocatorUnittest{};
 
-	template<size_t BlockSize,size_t MaxLoops = 100>
+	template<size_t BlockSize,size_t MaxLoops = 100000>
 	struct MemoryAllocUnittest
 	{
 	public: 
