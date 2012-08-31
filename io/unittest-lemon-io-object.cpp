@@ -26,10 +26,10 @@ namespace lemon{namespace io{namespace test{
 		memory::smallobject::allocator<64> _allocator;
 	};
 
-	class TestObject : public Object<TestObject,TestIOService>
+	class TestObject : public ObjectT<TestObject,TestIOService>
 	{
 	public:
-		TestObject(TestIOService * service) : Object<TestObject,TestIOService>(service) {}
+		TestObject(TestIOService * service) : ObjectT<TestObject,TestIOService>(service) {}
 
 		//size_t Data[14];
 	};
