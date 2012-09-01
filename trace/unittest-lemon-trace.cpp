@@ -58,7 +58,7 @@ namespace lemon{namespace trace{namespace test{
 
 		size_t counter = 0;
 
-		size_t loop = 10000;
+		size_t loop = 100000;
 
 		provider p(s,&id);
 
