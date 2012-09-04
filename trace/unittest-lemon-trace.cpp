@@ -23,7 +23,7 @@ namespace lemon{namespace trace{namespace test{
 
 		LEMON_CHECK(description.ProcessId == LemonGetProcessID());
 
-		LEMON_CHECK(tid == description.ThreadId);
+		LEMON_CHECK(tid != description.ThreadId);
 
 		LEMON_CHECK(description.Flag == flag);
 

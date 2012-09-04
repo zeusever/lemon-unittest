@@ -4,6 +4,7 @@
 #include <lemonxx/function/bind.hpp>
 #include <lemonxx/unittest/unittest.hpp>
 
+
 namespace lemon{namespace io{namespace test{
 	
 	class SocketUnittest{};
@@ -105,7 +106,7 @@ namespace lemon{namespace io{namespace test{
 
 		net::endpoint remote;
 
-		tcp::connection cnn = server.accept(remote);
+		tcp::connection cnn(server.accept(remote));
 
 		char buffer[512] = {0};
 

@@ -105,7 +105,7 @@ namespace lemon{namespace memory{namespace test{
 		{
 			++ iter;
 
-			memcmp(&i,*iter,sizeof(i));
+			memcpy(&i,*iter,sizeof(i));
 		}
 
 		

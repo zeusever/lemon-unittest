@@ -38,7 +38,7 @@ namespace lemon{namespace resource{namespace test{
 
 		const lemon_char_t* begin = (const lemon_char_t*)get<0>(result);
 
-		const lemon_char_t* end = begin + get<1>(result) / 2;
+		const lemon_char_t* end = begin + get<1>(result) / sizeof(lemon_char_t);
 
 		LEMON_CHECK(get<1>(result) % 2 == 0);
 
@@ -49,7 +49,7 @@ namespace lemon{namespace resource{namespace test{
 
 			const lemon_char_t* begin = (const lemon_char_t*)get<0>(result);
 
-			const lemon_char_t* end = begin + get<1>(result) / 2;
+			const lemon_char_t* end = begin + get<1>(result) / sizeof(lemon_char_t);
 
 			LEMON_CHECK(get<1>(result) % 2 == 0);
 
