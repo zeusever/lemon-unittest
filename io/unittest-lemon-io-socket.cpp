@@ -128,16 +128,18 @@ namespace lemon{namespace io{namespace test{
 		char buffer[255];
 	};
 
-	void AsyncSend(size_t /*numberOfBytesTransferred*/ , const LemonErrorInfo & errorCode)
+	void AsyncSend(Connection & conn,size_t /*numberOfBytesTransferred*/ , const LemonErrorInfo & errorCode)
 	{
 		LEMON_CHECK(LEMON_SUCCESS(errorCode));
+
+		conn.conn.close();
 	}
 
 	void AsyncReceive(Connection & conn,size_t /*numberOfBytesTransferred*/ , const LemonErrorInfo & errorCode)
 	{
 		LEMON_CHECK(LEMON_SUCCESS(errorCode));
 		
-		conn.conn.async_send(cbuf("hello world"),&AsyncSend);
+		conn.conn.async_send(cbuf("hello world"),lemon::bind(&AsyncSend,ref(conn),_0,_1));
 
 	}
 
@@ -162,7 +164,7 @@ namespace lemon{namespace io{namespace test{
 
 		io_service service;
 
-		service.start(4);
+		service.start(1);
 
 		tcp::server server(ep,service);
 
@@ -188,6 +190,8 @@ namespace lemon{namespace io{namespace test{
 			clients[i].send(cbuf("hello world"));
 
 			clients[i].receive(buf(buffer));
+
+			clients[i].close();
 		}
 
 		service.stop();
