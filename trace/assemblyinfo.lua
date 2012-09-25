@@ -4,6 +4,8 @@ assembly =
 
 	dtrace = 
 	{	
+		name = "UNITTEST_LEMON_TRACE";
+
 		catalog = 
 		{
 			{

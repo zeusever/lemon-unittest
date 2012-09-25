@@ -3,6 +3,7 @@
 #include <lemonxx/function/bind.hpp>
 #include <lemonxx/unittest/unittest.hpp>
 #include <unittest/lemon/trace/assembly.h>
+#include <unittest/lemon/trace/unittest-lemon-trace.cpp.g.hpp>
 
 namespace lemon{namespace trace{namespace test{
 
@@ -23,7 +24,7 @@ namespace lemon{namespace trace{namespace test{
 
 		LEMON_CHECK(description.ProcessId == LemonGetProcessID());
 
-		LEMON_CHECK(tid != description.ThreadId);
+		LEMON_CHECK(tid == description.ThreadId);
 
 		LEMON_CHECK(description.Flag == flag);
 
@@ -99,6 +100,18 @@ namespace lemon{namespace trace{namespace test{
 
 		cv.wait(lock);
 		
+	}
+
+
+	LEMON_UNITTEST_CASE(TraceUnittest,CxxGenerateTest)
+	{
+		lemon::uuid_t id;
+
+		service s;
+
+		provider p(s,&id);
+
+		UNITTEST_LEMON_TRACE(p,LEMON_TL_DEBUG,UNITTEST_LEMON_TRACE_CATALOG_ONE,"hello world!!![1] ... [0]",3,"world");
 	}
 
 }}}
