@@ -108,7 +108,7 @@ namespace lemon{namespace io{namespace test{
 
 		tcp::connection cnn(server.accept(remote));
 
-		char buffer[512] = {0};
+		char buffer[1024] = {0};
 
 		cnn.receive(buf(buffer));
 

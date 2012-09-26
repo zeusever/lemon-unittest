@@ -16,7 +16,7 @@ namespace lemon{namespace trace{namespace test{
 
 	class TraceUnittest{};
 
-	void Trace(size_t &counter , size_t loop, condition_variable & cv,lemon::uuid_t id,flag_t flag,lemon_tid_t tid,const message & msg)
+	void Trace(size_t &counter , size_t loop, condition_variable & cv,lemon::uuid_t id,flag_t flag,lemon_pid_t tid,const message & msg)
 	{
 		description_t description;
 
