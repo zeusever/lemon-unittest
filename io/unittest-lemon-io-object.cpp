@@ -12,12 +12,18 @@ namespace lemon{namespace io{namespace test{
 	public:
 		
 		typedef SocketImpl socket_service;
-
-
 	};
 
 	LEMON_UNITTEST_CASE(IObjectUnittest,CompilerTest)
 	{
-		impl::basic_io_service<IOServiceImpl>	ioservice;
+		typedef impl::basic_io_service<IOServiceImpl>	io_service;
+
+		typedef io_service::socket_type socket_type;
+
+		io_service ioservice;
+
+		socket_type  * socket = new (&ioservice) socket_type();
+
+		delete socket;
 	}
 }}}
