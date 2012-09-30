@@ -8,6 +8,7 @@ namespace lemon{namespace io{namespace test{
 
 	void SyncServer(net::endpoint ep,io_service & service)
 	{
+		
 		tcp::server server(ep,service);
 
 		server.listen(SOMAXCONN);
@@ -17,6 +18,7 @@ namespace lemon{namespace io{namespace test{
 		tcp::connection cnn(server.accept(remote));
 
 		cnn.send(lemon::cbuf("hello world"));
+		
 	}
 
 	LEMON_UNITTEST_CASE(SocketUnittest,SyncAPITest)
@@ -31,7 +33,9 @@ namespace lemon{namespace io{namespace test{
 
 		lemon::thread_t server(lemon::bind(&SyncServer,remote,ref(service)));
 
-		sleep(4000);
+		lemon::sleep(4000);
+
+		std::cout << "timeout ..." << std::endl;
 
 		client.connect(remote);
 
