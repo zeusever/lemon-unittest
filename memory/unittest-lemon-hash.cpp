@@ -7,9 +7,9 @@ namespace lemon{namespace memeory{namespace test{
 
 	LEMON_UNITTEST_CASE(HashMapUnittest,STLHashMapTest)
 	{
-		std::hash_map<std::string,int> map;
+		std::hash_map<int,int> map;
 
-		map["test"] = 1;
+		map[64] = 1;
 	}
 
 }}}
