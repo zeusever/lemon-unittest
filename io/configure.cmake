@@ -1,0 +1,4 @@
+include(CheckIncludeFileCXX)
+
+
+check_include_file_cxx(hash_map  UNITTEST_LEMON_IO_HAS_HASH_MAP)

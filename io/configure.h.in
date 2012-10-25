@@ -1,0 +1,2 @@
+#cmakedefine UNITTEST_LEMON_IO_HAS_HASH_MAP
+
