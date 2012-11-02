@@ -5,7 +5,7 @@ namespace lemon{namespace io{namespace test{
 
 	class LemonIOEventsUnittest{};
 
-	lemon_bool TestIOExecutor(LemonIOEvent /*E*/, size_t * /*numberOfBytesTransferred*/, LemonErrorInfo * errorCode)
+	lemon_bool TestIOExecutor(__lemon_io_file ,LemonIOEvent /*E*/, size_t * /*numberOfBytesTransferred*/, LemonErrorInfo * errorCode)
 	{
 		LEMON_RESET_ERRORINFO(*errorCode);
 
