@@ -135,11 +135,9 @@ namespace lemon{namespace io{namespace test{
 		}
 	}
 
-	void AsyncAccept(io_service &service,size_t & counter,ip::tcp::connection::wrapper_type io, const LemonErrorInfo & errorCode)
+	void AsyncAccept(io_service &service,size_t & counter,ip::tcp::connection::wrapper_type, const LemonErrorInfo & errorCode)
 	{
 		LEMON_CHECK(LEMON_SUCCESS(errorCode));
-
-		io;
 
 		++ counter;
 
