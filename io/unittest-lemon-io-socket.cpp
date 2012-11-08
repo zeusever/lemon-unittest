@@ -306,22 +306,30 @@ namespace lemon{namespace io{namespace test{
 
 		size_t counter = 0;
 
-		TcpClient * clients[UNITTEST_TCP_MAX_CLIENT];
-
-		for(size_t i =0; i <  UNITTEST_TCP_MAX_CLIENT; ++ i)
+		for(size_t i =0; i < 100000; ++i)
 		{
-			try
-			{
-				clients[i] = new TcpClient(service,counter,ep);
-			}
-			catch(const lemon::error_info &e)
-			{
-				std::cout << e << std::endl;
-			}
-			
-		}
+			TcpClient * clients[UNITTEST_TCP_MAX_CLIENT];
 
-		service.dispatch();
+			for(size_t i =0; i <  UNITTEST_TCP_MAX_CLIENT; ++ i)
+			{
+				try
+				{
+					clients[i] = new TcpClient(service,counter,ep);
+				}
+				catch(const lemon::error_info &e)
+				{
+					std::cout << e << std::endl;
+				}
+
+			}
+
+			service.dispatch();
+
+			for(size_t i =0; i <  UNITTEST_TCP_MAX_CLIENT; ++ i)
+			{
+				delete clients[i];
+			}
+		}
 	}
 }}}
 
