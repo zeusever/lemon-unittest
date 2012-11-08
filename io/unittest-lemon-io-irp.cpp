@@ -114,11 +114,8 @@ namespace lemon{namespace io{namespace test{
 	}
 
 	class LemonIRPTableUnittest{};
-#ifdef LEMON_IO_IOCP
-	lemon_bool CancelIRProc(LemonIRP /*irp*/,const LemonErrorInfo * errorCode)
-#else
+
 	lemon_bool CancelIRProc(LemonIRP /*irp*/,LemonErrorInfo * errorCode)
-#endif 
 	{
 		LEMON_CHECK(LEMON_ERRORINOF_EQ(errorCode->Error,LEMON_IO_ASYNC_CANCEL) == lemon_true);
 
@@ -302,7 +299,7 @@ namespace lemon{namespace io{namespace test{
 
 #ifdef LEMON_IO_IOCP
 
-	lemon_bool IRProc1(LemonIRP irp,const LemonErrorInfo * /*errorCode*/)
+	lemon_bool IRProc1(LemonIRP irp, LemonErrorInfo * /*errorCode*/)
 	{
 		size_t &counter = *(size_t*)irp->UserData;
 

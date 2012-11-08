@@ -69,29 +69,48 @@ namespace lemon{namespace io{namespace test{
 		}
 	}
 
+	void SocketShutDownTestClient(ip::tcp::client & c, lemon::net::endpoint & remote,const std::string & message)
+	{
+		lemon::sleep(1000);
+
+		c.connect(remote);
+
+		c.send(lemon::cbuf(message));
+
+		c.shutdown(SD_SEND);
+
+		LEMON_UNITTEST_EXPECT_EXCEPTION(c.send(lemon::cbuf(message)),lemon::error_info);
+	}
+
 	LEMON_UNITTEST_CASE(SocketUnittest,SocketShutDownTest)
 	{
 		io_service service;
 
 		lemon::net::endpoint ep(lemon::net::resolver_iterator("127.0.0.1","1812")->ai_addr);
 
-		ip::udp::socket s(ep,service),c(ep.af(),service);
+		lemon::net::endpoint remote;
+
+		ip::tcp::server s(ep,service);
+
+		s.listen(SOMAXCONN);
+		
+		ip::tcp::client c(ep.af(),service);
 
 		char recvBuffer[1024] = {0};
 
 		std::string message = "hello the async io world!!!!";
 
-		c.sendto(lemon::cbuf(message),ep);
+		lemon::thread_t t(lemon::bind(&SocketShutDownTestClient,lemon::ref(c),lemon::ref(ep),lemon::cref(message)));
 
-		c.shutdown(SD_SEND);
+		ip::tcp::connection cnn(s.accept(remote));
 
-		LEMON_UNITTEST_EXPECT_EXCEPTION(c.sendto(lemon::cbuf(message),ep),lemon::error_info);
+		cnn.receive(lemon::buf(recvBuffer));
 
-		s.recvfrom(buf(recvBuffer),ep);
+		cnn.shutdown(SD_RECEIVE);
 
-		s.shutdown(SD_RECEIVE);
+		LEMON_UNITTEST_EXPECT_EXCEPTION(cnn.receive(buf(recvBuffer)),lemon::error_info);
 
-		LEMON_UNITTEST_EXPECT_EXCEPTION(s.recvfrom(buf(recvBuffer),ep),lemon::error_info);
+		t.join();
 	}
 
 	void SyncClient(ip::tcp::client & c, lemon::net::endpoint & remote,const std::string & message)
