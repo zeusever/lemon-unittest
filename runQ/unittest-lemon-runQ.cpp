@@ -30,6 +30,30 @@ namespace lemon{namespace runQ{namespace test{
 		service.run();
 	}
 
+	struct faild_route_job
+	{
+		faild_route_job(runQ_service & service,job_id self)
+		{
+			LEMON_UNITTEST_EXPECT_EXCEPTION(service.send(self,LEMON_MAKE_JOB_ID(1,1),mutable_buffer()),error_info);
+
+			service.stop();
+		}
+
+		void recv(runQ_service & /*service*/,job_id,job_id /*source*/,const_buffer /*buffer*/)
+		{
+			LEMON_CHECK(false && "can't here");
+		}
+	};
+
+	LEMON_UNITTEST_CASE(RunQUnittest,RouteRemoteFailedTest)
+	{
+		runQ_service service;
+
+		basic_job_class<faild_route_job> job(service);
+
+		service.run();
+	}
+
 	struct exit_message_job
 	{
 		static const int counter = 100000;
