@@ -56,7 +56,7 @@ namespace lemon{namespace runQ{namespace test{
 
 	struct exit_message_job
 	{
-		static const int counter = 100000;
+		static const int counter = 10;
 
 		exit_message_job(runQ_service & service,job_id id) 
 		{
@@ -127,7 +127,7 @@ namespace lemon{namespace runQ{namespace test{
 			{
 				++ *Data;
 
-				lemon::sleep(10);//simulate io operation
+				lemon::sleep(1000);//simulate io operation
 
 				service.send(self,buffer_cast<MapMessage>(buffer).Data.ReduceJob,mutable_buffer());
 
@@ -145,7 +145,7 @@ namespace lemon{namespace runQ{namespace test{
 	{
 	public:
 
-		const static int maxcounter = 3000;
+		const static int maxcounter = 10;
 
 		MapJob(runQ_service & service,job_id self):counter(0),_buffer(maxcounter,0),_jobs(maxcounter,0)
 		{

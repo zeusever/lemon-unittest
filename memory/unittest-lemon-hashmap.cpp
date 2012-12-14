@@ -3,7 +3,7 @@
 #include <unittest/lemon/memory/configure.h>
 
 #ifdef HAS_STL_HASH_MAP
-#include <hash_map>
+#include <unordered_map>
 #endif //HAS_STL_HASH_MAP
 
 namespace lemon{namespace memory{namespace test{
@@ -66,7 +66,7 @@ namespace lemon{namespace memory{namespace test{
 #ifdef HAS_STL_HASH_MAP
 	LEMON_UNITTEST_CASE(HashMapUnittest,STLSizeKeyTest)
 	{
-		std::hash_map<size_t,size_t> map;
+		std::unordered_map<size_t,size_t> map;
 
 		size_t buffer[1024 * 1024];
 
