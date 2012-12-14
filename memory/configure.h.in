@@ -1,0 +1,2 @@
+#cmakedefine HAS_STL_HASH_MAP
+
