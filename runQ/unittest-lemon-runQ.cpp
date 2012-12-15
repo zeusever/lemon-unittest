@@ -1,4 +1,5 @@
 #include <lemonxx/function/bind.hpp>
+#include <lemon/runQ/assembly.h>
 #include <lemonxx/runQ/runQ.hpp>
 #include <lemonxx/unittest/unittest.hpp>
 
@@ -20,14 +21,14 @@ namespace lemon{namespace runQ{namespace test{
 		}
 	};
 
-	// LEMON_UNITTEST_CASE(RunQUnittest,ExitJobTest)
-	// {
-	// 	runQ_service Q;
+	 LEMON_UNITTEST_CASE(RunQUnittest,ExitJobTest)
+	 {
+	 	runQ_service Q;
 
-	// 	ExitJob::create(Q);
+	 	ExitJob::create(Q);
 
-	// 	Q.run();
-	// }
+	 	Q.run();
+	 }
 
 	class ResetJob : public basic_job_class<ResetJob>
 	{
@@ -38,23 +39,23 @@ namespace lemon{namespace runQ{namespace test{
 		}
 	};
 
-	// LEMON_UNITTEST_CASE(RunQUnittest,ResetJobTest)
-	// {
-	// 	runQ_service Q;
+	 LEMON_UNITTEST_CASE(RunQUnittest,ResetJobTest)
+	 {
+	 	runQ_service Q;
 
-	// 	for(size_t i = 0; i < 10000; ++ i)
-	// 	{
-	// 		job_id  id = ResetJob::create(Q);
+	 	for(size_t i = 0; i < 10000; ++ i)
+	 	{
+	 		job_id  id = ResetJob::create(Q);
 
-	// 		runQ::send(Q,LEMON_INVALID_JOB_ID,id,mutable_buffer());
+	 		runQ::send(Q,LEMON_INVALID_JOB_ID,id,mutable_buffer());
 
-	// 		Q.run();
+	 		Q.run();
 	
-	// 		Q.reset();
+	 		Q.reset();
 
-	// 		LEMON_CHECK(Q.jobs() == 0);
-	// 	}
-	// }
+	 		LEMON_CHECK(Q.jobs() == 0);
+	 	}
+	 }
 
 	class TimeoutJob : public basic_job_class<TimeoutJob>
 	{
@@ -95,25 +96,109 @@ namespace lemon{namespace runQ{namespace test{
 		size_t					_counter;
 	};
 
-	// LEMON_UNITTEST_CASE(RunQUnittest,TimeoutJobTest)
-	// {
-	// 	runQ_service Q;
+	 LEMON_UNITTEST_CASE(RunQUnittest,TimeoutJobTest)
+	 {
+	 	runQ_service Q;
 
-	// 	for(size_t i = 0; i < 1; ++ i)
-	// 	{
-	// 		TimeoutJob::create(Q);
+	 	for(size_t i = 0; i < 1; ++ i)
+	 	{
+	 		TimeoutJob::create(Q);
 
-	// 		Q.run();
+	 		Q.run();
 
-	// 		Q.reset();
+	 		Q.reset();
 
-	// 		start_timer(Q,TimeoutJob1::create(Q),100);
+	 		start_timer(Q,TimeoutJob1::create(Q),100);
 
-	// 		Q.run();
+	 		Q.run();
 
-	// 		Q.reset();
-	// 	}
-	// }
+	 		Q.reset();
+	 	}
+	 }
+
+	 class TimerCloseJob : public basic_job_class<TimerCloseJob>
+	 {
+	 public:
+		 TimerCloseJob():_counter(0){}
+
+		 void initialize()
+		 {
+			 start_timer(100);
+		 }
+
+		 void timeout()
+		 {
+			 ++ _counter;
+
+			 _timer.reset();
+
+			 if(_counter == 10) stop_timer();
+		 }
+
+		 void recv(lemon_job_id /*source*/, mutable_buffer /*buff*/)
+		 {
+			 if(_timer.duration() / 10000000 > 4) close();
+		 }
+
+	 private:
+
+		 lemon::timer_t									_timer;
+
+		 size_t											_counter;
+	 };
+
+	 class TimerCloseServerJob : public basic_job_class<TimerCloseServerJob>
+	 {
+	 public:
+		 void initialize()
+		 {
+			 for(size_t i =0; i < 1000; ++ i)
+			 {
+				 _taxis.push_back(TimerCloseJob::create(service()));
+			 }
+
+			 start_timer(1000);
+		 }
+
+		 void timeout()
+		 {
+			 std::cout << "taxi counter :" << jobs(service()) << std::endl;
+
+			 if(jobs(service()) == 1){ exit(); return;}
+
+			 std::vector<job_id>::const_iterator iter,end = _taxis.end();
+
+			 for(iter = _taxis.begin(); iter != end; ++ iter)
+			 {
+				 try
+				 {
+					 send(*iter,mutable_buffer());
+				 }
+				 catch(const error_info & e)
+				 {
+					 if(!LEMON_ERRORINOF_EQ(e.Error,LEMON_RUNQ_INVALID_JOB_ID)) throw e;
+				 }
+				 
+			 }
+		 }
+
+	 private:
+		 std::vector<job_id>										_taxis;
+	 };
+
+	 LEMON_UNITTEST_CASE(RunQUnittest,TimerCloseTest)
+	 {
+		 runQ_service Q;
+
+		 for(size_t i = 0; i < 2; ++ i)
+		 {
+			 TimerCloseServerJob::create(Q);
+
+			 Q.run();
+
+			 Q.reset();
+		 }
+	 }
 
 	//////////////////////////////////////////////////////////////////////////
 
@@ -278,7 +363,7 @@ namespace lemon{namespace runQ{namespace test{
 
 		iTaxiGateway::create(Q);
 
-		thread_group works(lemon::bind(&runQ_service::run,&Q),1);
+		thread_group works(lemon::bind(&runQ_service::run,&Q),4);
 
 		works.join();
 
