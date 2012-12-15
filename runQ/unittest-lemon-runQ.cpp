@@ -56,6 +56,67 @@ namespace lemon{namespace runQ{namespace test{
 		}
 	}
 
+	class TimeoutJob : public basic_job_class<TimeoutJob>
+	{
+	public:
+		TimeoutJob():_counter(0){}
+
+		void initialize()
+		{
+			start_timer(100);
+		}
+
+		void timeout()
+		{
+			++ _counter;
+
+			std::cout << "TimeoutJob called -- (" << _counter << ")" << std::endl;
+			
+			if(_counter == 10) exit();
+		}
+	private:
+		size_t					_counter;
+	};
+
+	class TimeoutJob1 : public basic_job_class<TimeoutJob1>
+	{
+	public:
+		TimeoutJob1():_counter(0){}
+
+		void timeout()
+		{
+			++ _counter;
+
+			std::cout << "TimeoutJob called -- (" << _counter << ")" << std::endl;
+
+			if(_counter == 10) exit();
+		}
+	private:
+		size_t					_counter;
+	};
+
+	LEMON_UNITTEST_CASE(RunQUnittest,TimeoutJobTest)
+	{
+		runQ_service Q;
+
+		for(size_t i = 0; i < 1; ++ i)
+		{
+			TimeoutJob::create(Q);
+
+			Q.run();
+
+			Q.reset();
+
+			start_timer(Q,TimeoutJob1::create(Q),100);
+
+			Q.run();
+
+			Q.reset();
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+
 	atomic_t globalCounter;
 
 	class iTaxi : public basic_job_class<iTaxi>
@@ -64,6 +125,11 @@ namespace lemon{namespace runQ{namespace test{
 
 		iTaxi():counter(0){}
 
+		void initialize()
+		{
+			start_timer(2000);
+		}
+
 		void recv(lemon_job_id source, mutable_buffer buff)
 		{
 			maxCounter = buffer_cast<size_t>(buff);
@@ -71,6 +137,8 @@ namespace lemon{namespace runQ{namespace test{
 			buffer_cast<size_t>(buff) = counter ++;
 
 			send(source,buff);
+
+			_timer.reset();
 		}
 
 		void uninitialize()
@@ -80,11 +148,21 @@ namespace lemon{namespace runQ{namespace test{
 			LEMON_CHECK(counter == maxCounter);
 		}
 
+		void timeout()
+		{
+			if(_timer.duration() / 10000000 > 10)
+			{
+				close();
+			}
+		}
+
 	private:
 
 		size_t											maxCounter;
 
 		size_t											counter;
+
+		lemon::timer_t									_timer;
 	};
 
 
@@ -93,7 +171,7 @@ namespace lemon{namespace runQ{namespace test{
 	{
 	public:
 
-		const static int maxLoop = 10;
+		const static int maxLoop = 100;
 
 		const static int maxTaxis = 300000;
 
@@ -136,7 +214,7 @@ namespace lemon{namespace runQ{namespace test{
 				
 				if(_loop == maxLoop) { 
 
-					exit(); return;
+					start_timer(2000); return;
 				}
 					
 				beat();
@@ -172,6 +250,13 @@ namespace lemon{namespace runQ{namespace test{
 				<< std::setw(6) << std::setfill('0') <<(duration % 10000000) / 10 
 
 				<< " s)" << std::endl;
+		}
+
+		void timeout()
+		{
+			std::cout << "taxi counter :" << jobs(service()) << std::endl;
+
+			if(jobs(service()) == 1) exit();
 		}
 
 	private:					
