@@ -6,233 +6,202 @@ namespace lemon{namespace runQ{namespace test{
 
 	class RunQUnittest{};
 
-	struct exit_job
-	{
-		exit_job(runQ_service & service,job_id)
-		{
-			service.stop();
-		}
-
-		void recv(runQ_service & /*service*/,job_id,job_id /*source*/,const_buffer /*buffer*/)
-		{
-			LEMON_CHECK(false && "can't here");
-		}
-	};
-	
-	
-
-	LEMON_UNITTEST_CASE(RunQUnittest,LoopTest)
-	{
-		runQ_service service;
-
-		basic_job_class<exit_job> job(service);
-
-		service.run();
-	}
-
-	struct faild_route_job
-	{
-		faild_route_job(runQ_service & service,job_id self)
-		{
-			LEMON_UNITTEST_EXPECT_EXCEPTION(service.send(self,LEMON_MAKE_JOB_ID(1,1),mutable_buffer()),error_info);
-
-			service.stop();
-		}
-
-		void recv(runQ_service & /*service*/,job_id,job_id /*source*/,const_buffer /*buffer*/)
-		{
-			LEMON_CHECK(false && "can't here");
-		}
-	};
-
-	LEMON_UNITTEST_CASE(RunQUnittest,RouteRemoteFailedTest)
-	{
-		runQ_service service;
-
-		basic_job_class<faild_route_job> job(service);
-
-		service.run();
-	}
-
-	struct exit_message_job
-	{
-		static const int counter = 10;
-
-		exit_message_job(runQ_service & service,job_id id) 
-		{
-			mutable_buffer buffer = service.alloc(sizeof(size_t));
-
-			buffer_cast<size_t>(buffer) = counter;
-
-			service.send(id,id,buffer);
-		}
-
-		void recv(runQ_service & service,job_id self,job_id source,mutable_buffer buffer)
-		{
-			LEMON_CHECK(source == self);
-
-			if(0 == buffer_cast<size_t>(buffer))
-			{
-				service.stop();
-			}
-			else
-			{
-				-- buffer_cast<size_t>(buffer);
-
-				service.send(self,source,buffer);
-			}
-		}
-	};
-
-	LEMON_UNITTEST_CASE(RunQUnittest,SendTest)
-	{
-		runQ_service service;
-
-		basic_job_class<exit_message_job> job(service);
-
-		thread_group works(lemon::bind(&runQ_service::run,&service),1);
-
-		works.join();
-
-		//service.run();
-	}
-
-	struct MapMessage
-	{
-		int				Type;
-
-		union{
-			
-			byte_t		*WorkData; 
-
-			job_id		ReduceJob;
-
-		}				Data;
-	};
-
-	class WorkJob
+	class ExitJob : public basic_job_class<ExitJob>
 	{
 	public:
-		WorkJob(runQ_service &,job_id ){}
-
-		void recv(runQ_service & service,job_id self,job_id /*source*/,const_buffer buffer)
+		void initialize()
 		{
-			if(buffer_cast<MapMessage>(buffer).Type == 0)
-			{
-				Data = buffer_cast<MapMessage>(buffer).Data.WorkData;
-
-				service.free(buffer);
-			}
-			else
-			{
-				++ *Data;
-
-				lemon::sleep(1000);//simulate io operation
-
-				service.send(self,buffer_cast<MapMessage>(buffer).Data.ReduceJob,mutable_buffer());
-
-				service.free(buffer);
-
-				service.close_job(self);
-			}
+			close();
 		}
 
-	private:
-		byte_t												*Data;
+		void uninitialize()
+		{
+			exit();
+		}
 	};
 
-	class MapJob
+	LEMON_UNITTEST_CASE(RunQUnittest,ExitJobTest)
+	{
+		runQ_service Q;
+
+		ExitJob::create(Q);
+
+		Q.run();
+	}
+
+	class ResetJob : public basic_job_class<ResetJob>
+	{
+	public:
+		void recv(lemon_job_id, mutable_buffer /*buff*/)
+		{
+			exit();
+		}
+	};
+
+	LEMON_UNITTEST_CASE(RunQUnittest,ResetJobTest)
+	{
+		runQ_service Q;
+
+		for(size_t i = 0; i < 10000; ++ i)
+		{
+			job_id  id = ResetJob::create(Q);
+
+			runQ::send(Q,LEMON_INVALID_JOB_ID,id,mutable_buffer());
+
+			Q.run();
+	
+			Q.reset();
+
+			LEMON_CHECK(Q.jobs() == 0);
+		}
+	}
+
+	atomic_t globalCounter;
+
+	class iTaxi : public basic_job_class<iTaxi>
 	{
 	public:
 
-		const static int maxcounter = 10;
+		iTaxi():counter(0){}
 
-		MapJob(runQ_service & service,job_id self):counter(0),_buffer(maxcounter,0),_jobs(maxcounter,0)
+		void recv(lemon_job_id source, mutable_buffer buff)
 		{
+			maxCounter = buffer_cast<size_t>(buff);
 
-			for(size_t i = 0; i < maxcounter; ++ i)
-			{
-				_jobs[i] = basic_job_class<WorkJob>::create(service);
+			buffer_cast<size_t>(buff) = counter ++;
 
-				MapMessage & message = buffer_cast<MapMessage>(service.alloc(sizeof(MapMessage)));
-
-				message.Data.WorkData = &_buffer[i];
-
-				service.send(self,_jobs[i],buf(message));
-			}
-
-			service.send(self,self,service.alloc(sizeof(size_t)));
+			send(source,buff);
 		}
 
-		void recv(runQ_service & service,job_id self,job_id /*source*/,mutable_buffer buffer)
+		void uninitialize()
 		{
-			if(!buffer.empty())
-			{
-				for(size_t i = 0; i < maxcounter; ++ i)
-				{
-					MapMessage & message = buffer_cast<MapMessage>(service.alloc(sizeof(MapMessage)));
+			++ globalCounter;
 
-					message.Type = 1;
-
-					message.Data.ReduceJob = self;
-
-					service.send(self,_jobs[i],buf(message));
-				}
-			}
-			else
-			{
-				++ counter;
-
-				if(counter == maxcounter) 
-				{
-					for(size_t i = 0; i < maxcounter; ++ i)
-					{
-						LEMON_CHECK(_buffer[i] == 1);
-					}
-
-					service.stop();
-				}
-			}
+			LEMON_CHECK(counter == maxCounter);
 		}
 
 	private:
-		size_t													counter;
 
-		std::vector<byte_t>										_buffer;
+		size_t											maxCounter;
 
-		std::vector<job_id>										_jobs;
+		size_t											counter;
 	};
 
 
-	LEMON_UNITTEST_CASE(RunQUnittest,PerformanceThreadOneTest)
+
+	class iTaxiGateway : public basic_job_class<iTaxiGateway>
 	{
-		runQ_service service;
+	public:
 
-		basic_job_class<MapJob> job(service);
+		const static int maxLoop = 10;
 
-		service.run();
-	}
+		const static int maxTaxis = 300000;
 
-	LEMON_UNITTEST_CASE(RunQUnittest,PerformanceThreadTwoTest)
+		void initialize()
+		{
+			_loop = 0;
+
+			for(size_t i =0; i < maxTaxis; ++ i)
+			{
+				_taxis.push_back(iTaxi::create(service()));
+			}
+
+			beat();
+		}
+
+		void recv(lemon_job_id id, mutable_buffer buff)
+		{
+			++ _responses;
+
+			id;
+
+			LEMON_CHECK(buffer_cast<size_t>(buff) == _loop);
+
+			free(buff);
+
+			if(_taxis.size() == _responses)
+			{
+
+				time_duration duration = _timer.duration();
+
+				std::cout << "recv taxi heart beat (" << _responses << ")" 
+
+					<< " -- success(" << duration / 10000000 << "." 
+
+					<< std::setw(6) << std::setfill('0') <<(duration % 10000000) / 10 
+
+					<< " s)" << std::endl;
+
+				++ _loop;
+				
+				if(_loop == maxLoop) { 
+
+					exit(); return;
+				}
+					
+				beat();
+
+			}
+		}
+
+		void beat()
+		{
+			_timer.reset();
+
+			lemon::timer_t timer;
+
+			std::vector<job_id>::const_iterator iter,end = _taxis.end();
+
+			for(iter = _taxis.begin(); iter != end; ++ iter)
+			{
+				mutable_buffer buffer = alloc(24);
+
+				buffer_cast<size_t>(buffer) = maxLoop;
+
+				send(*iter,buffer);
+			}
+
+			_responses = 0;
+
+			time_duration duration = timer.duration();
+
+			std::cout << "send taxi heart beat (" << _taxis.size() << ")"  
+
+				<< " -- success(" << duration / 10000000 << "." 
+
+				<< std::setw(6) << std::setfill('0') <<(duration % 10000000) / 10 
+
+				<< " s)" << std::endl;
+		}
+
+	private:					
+
+		lemon::timer_t											_timer;
+
+		size_t													_loop;
+
+		size_t													_responses;
+
+		std::vector<job_id>										_taxis;
+	};
+
+	LEMON_UNITTEST_CASE(RunQUnittest,iTaxiGatewayTest)
 	{
-		runQ_service service;
+		globalCounter = 0;
 
-		basic_job_class<MapJob> job(service);
+		runQ_service Q;
 
-		thread_group works(lemon::bind(&runQ_service::run,&service),2);
+		iTaxiGateway::create(Q);
+
+		thread_group works(lemon::bind(&runQ_service::run,&Q),1);
 
 		works.join();
-	}
 
-	LEMON_UNITTEST_CASE(RunQUnittest,PerformanceThreadFourTest)
-	{
-		runQ_service service;
+		Q.reset();
 
-		basic_job_class<MapJob> job(service);
+		LEMON_CHECK(Q.jobs() == 0);
 
-		thread_group works(lemon::bind(&runQ_service::run,&service),4);
-
-		works.join();
+		LEMON_CHECK(globalCounter == iTaxiGateway::maxTaxis);
 	}
 
 }}}
