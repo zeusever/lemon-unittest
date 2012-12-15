@@ -20,14 +20,14 @@ namespace lemon{namespace runQ{namespace test{
 		}
 	};
 
-	LEMON_UNITTEST_CASE(RunQUnittest,ExitJobTest)
-	{
-		runQ_service Q;
+	// LEMON_UNITTEST_CASE(RunQUnittest,ExitJobTest)
+	// {
+	// 	runQ_service Q;
 
-		ExitJob::create(Q);
+	// 	ExitJob::create(Q);
 
-		Q.run();
-	}
+	// 	Q.run();
+	// }
 
 	class ResetJob : public basic_job_class<ResetJob>
 	{
@@ -38,23 +38,23 @@ namespace lemon{namespace runQ{namespace test{
 		}
 	};
 
-	LEMON_UNITTEST_CASE(RunQUnittest,ResetJobTest)
-	{
-		runQ_service Q;
+	// LEMON_UNITTEST_CASE(RunQUnittest,ResetJobTest)
+	// {
+	// 	runQ_service Q;
 
-		for(size_t i = 0; i < 10000; ++ i)
-		{
-			job_id  id = ResetJob::create(Q);
+	// 	for(size_t i = 0; i < 10000; ++ i)
+	// 	{
+	// 		job_id  id = ResetJob::create(Q);
 
-			runQ::send(Q,LEMON_INVALID_JOB_ID,id,mutable_buffer());
+	// 		runQ::send(Q,LEMON_INVALID_JOB_ID,id,mutable_buffer());
 
-			Q.run();
+	// 		Q.run();
 	
-			Q.reset();
+	// 		Q.reset();
 
-			LEMON_CHECK(Q.jobs() == 0);
-		}
-	}
+	// 		LEMON_CHECK(Q.jobs() == 0);
+	// 	}
+	// }
 
 	class TimeoutJob : public basic_job_class<TimeoutJob>
 	{
@@ -95,25 +95,25 @@ namespace lemon{namespace runQ{namespace test{
 		size_t					_counter;
 	};
 
-	LEMON_UNITTEST_CASE(RunQUnittest,TimeoutJobTest)
-	{
-		runQ_service Q;
+	// LEMON_UNITTEST_CASE(RunQUnittest,TimeoutJobTest)
+	// {
+	// 	runQ_service Q;
 
-		for(size_t i = 0; i < 1; ++ i)
-		{
-			TimeoutJob::create(Q);
+	// 	for(size_t i = 0; i < 1; ++ i)
+	// 	{
+	// 		TimeoutJob::create(Q);
 
-			Q.run();
+	// 		Q.run();
 
-			Q.reset();
+	// 		Q.reset();
 
-			start_timer(Q,TimeoutJob1::create(Q),100);
+	// 		start_timer(Q,TimeoutJob1::create(Q),100);
 
-			Q.run();
+	// 		Q.run();
 
-			Q.reset();
-		}
-	}
+	// 		Q.reset();
+	// 	}
+	// }
 
 	//////////////////////////////////////////////////////////////////////////
 
@@ -171,7 +171,7 @@ namespace lemon{namespace runQ{namespace test{
 	{
 	public:
 
-		const static int maxLoop = 100;
+		const static int maxLoop = 10;
 
 		const static int maxTaxis = 300000;
 
