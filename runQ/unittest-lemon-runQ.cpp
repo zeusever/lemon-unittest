@@ -212,7 +212,7 @@ namespace lemon{namespace runQ{namespace test{
 
 		void initialize()
 		{
-			start_timer(2000);
+			start_timer(10000);
 		}
 
 		void recv(lemon_job_id source, mutable_buffer buff)
@@ -258,16 +258,28 @@ namespace lemon{namespace runQ{namespace test{
 
 		const static int maxLoop = 10;
 
-		const static int maxTaxis = 300000;
+		const static int maxTaxis = 1000000;
 
 		void initialize()
 		{
 			_loop = 0;
 
+			lemon::timer_t timer;
+
 			for(size_t i =0; i < maxTaxis; ++ i)
 			{
 				_taxis.push_back(iTaxi::create(service()));
 			}
+
+			time_duration duration = timer.duration();
+
+			std::cout << "create taxis (" << _taxis.size() << ")"  
+
+				<< " -- success(" << duration / 10000000 << "." 
+
+				<< std::setw(6) << std::setfill('0') <<(duration % 10000000) / 10 
+
+				<< " s)" << std::endl;
 
 			beat();
 		}
@@ -363,7 +375,7 @@ namespace lemon{namespace runQ{namespace test{
 
 		iTaxiGateway::create(Q);
 
-		thread_group works(lemon::bind(&runQ_service::run,&Q),4);
+		thread_group works(lemon::bind(&runQ_service::run,&Q),1);
 
 		works.join();
 
