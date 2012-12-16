@@ -47,7 +47,7 @@ namespace lemon{namespace runQ{namespace test{
 	 	{
 	 		job_id  id = ResetJob::create(Q);
 
-	 		runQ::send(Q,LEMON_INVALID_JOB_ID,id,mutable_buffer());
+	 		runQ::send(Q,LEMON_INVALID_JOBID,id,mutable_buffer());
 
 	 		Q.run();
 	
@@ -212,7 +212,7 @@ namespace lemon{namespace runQ{namespace test{
 
 		void initialize()
 		{
-			start_timer(10000);
+			start_timer(1000);
 		}
 
 		void recv(lemon_job_id source, mutable_buffer buff)
@@ -231,6 +231,8 @@ namespace lemon{namespace runQ{namespace test{
 			++ globalCounter;
 
 			LEMON_CHECK(counter == maxCounter);
+
+			send(LEMON_SET_JOBID_REMOTE(1,1),mutable_buffer());
 		}
 
 		void timeout()
@@ -256,13 +258,15 @@ namespace lemon{namespace runQ{namespace test{
 	{
 	public:
 
-		const static int maxLoop = 10;
+		const static int maxLoop = 100;
 
-		const static int maxTaxis = 1000000;
+		const static int maxTaxis = 300000;
 
 		void initialize()
 		{
 			_loop = 0;
+
+			_proxyCounter = 0;
 
 			lemon::timer_t timer;
 
@@ -321,8 +325,6 @@ namespace lemon{namespace runQ{namespace test{
 
 		void beat()
 		{
-			_timer.reset();
-
 			lemon::timer_t timer;
 
 			std::vector<job_id>::const_iterator iter,end = _taxis.end();
@@ -347,13 +349,22 @@ namespace lemon{namespace runQ{namespace test{
 				<< std::setw(6) << std::setfill('0') <<(duration % 10000000) / 10 
 
 				<< " s)" << std::endl;
+
+			_timer.reset();
 		}
 
 		void timeout()
 		{
 			std::cout << "taxi counter :" << jobs(service()) << std::endl;
 
-			if(jobs(service()) == 1) exit();
+			if(_proxyCounter == maxTaxis) exit();
+		}
+
+		void proxy(job_id, job_id target,const_buffer)
+		{
+			LEMON_CHECK(LEMON_JOBID_IS_REMOTE(target) != 0);
+
+			++ _proxyCounter;
 		}
 
 	private:					
@@ -365,6 +376,8 @@ namespace lemon{namespace runQ{namespace test{
 		size_t													_responses;
 
 		std::vector<job_id>										_taxis;
+
+		size_t													_proxyCounter;
 	};
 
 	LEMON_UNITTEST_CASE(RunQUnittest,iTaxiGatewayTest)
@@ -373,7 +386,7 @@ namespace lemon{namespace runQ{namespace test{
 
 		runQ_service Q;
 
-		iTaxiGateway::create(Q);
+		Q.proxy(iTaxiGateway::create(Q));
 
 		thread_group works(lemon::bind(&runQ_service::run,&Q),1);
 
@@ -385,5 +398,4 @@ namespace lemon{namespace runQ{namespace test{
 
 		LEMON_CHECK(globalCounter == iTaxiGateway::maxTaxis);
 	}
-
 }}}
