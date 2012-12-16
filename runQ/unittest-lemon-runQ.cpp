@@ -10,7 +10,7 @@ namespace lemon{namespace runQ{namespace test{
 	class ExitJob : public basic_job_class<ExitJob>
 	{
 	public:
-		void initialize()
+		void initialize(void*)
 		{
 			close();
 		}
@@ -62,7 +62,7 @@ namespace lemon{namespace runQ{namespace test{
 	public:
 		TimeoutJob():_counter(0){}
 
-		void initialize()
+		void initialize(void*)
 		{
 			start_timer(100);
 		}
@@ -121,7 +121,7 @@ namespace lemon{namespace runQ{namespace test{
 	 public:
 		 TimerCloseJob():_counter(0){}
 
-		 void initialize()
+		 void initialize(void*)
 		 {
 			 start_timer(100);
 		 }
@@ -150,7 +150,7 @@ namespace lemon{namespace runQ{namespace test{
 	 class TimerCloseServerJob : public basic_job_class<TimerCloseServerJob>
 	 {
 	 public:
-		 void initialize()
+		 void initialize(void*)
 		 {
 			 for(size_t i =0; i < 1000; ++ i)
 			 {
@@ -210,7 +210,7 @@ namespace lemon{namespace runQ{namespace test{
 
 		iTaxi():counter(0){}
 
-		void initialize()
+		void initialize(void*)
 		{
 			start_timer(1000);
 		}
@@ -262,7 +262,7 @@ namespace lemon{namespace runQ{namespace test{
 
 		const static int maxTaxis = 300000;
 
-		void initialize()
+		void initialize(void*)
 		{
 			_loop = 0;
 
