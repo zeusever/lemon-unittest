@@ -388,7 +388,7 @@ namespace lemon{namespace runQ{namespace test{
 
 		Q.proxy(iTaxiGateway::create(Q));
 
-		thread_group works(lemon::bind(&runQ_service::run,&Q),1);
+		thread_group works(lemon::bind(&runQ_service::run,&Q),2);
 
 		works.join();
 
