@@ -27,7 +27,95 @@ namespace lemon{namespace runQ{namespace test{
 
 	 	ExitJob::create(Q);
 
-	 	Q.run();
+		thread_group works(lemon::bind(&runQ_service::run,&Q),8);
+
+		works.join();
+	 }
+
+	 class GroupJob : public basic_job_class<GroupJob>
+	 {
+	 public:
+
+		 void initialize(void* param)
+		 {
+			 _group = *(job_id*)param;
+
+			 entry_group(_group);
+		 }
+
+		 void multicast(lemon_job_id, const_buffer buffer)
+		 {
+			 LEMON_CHECK(!LEMON_CHECK_BUFF(buffer));
+
+			 leave_group(_group);
+
+			 close();
+		 }
+
+	 private:
+
+		 job_id _group; 
+	 };
+
+	  class GroupServer : public basic_job_class<GroupServer>
+	  {
+	  public:
+
+		  static const size_t counter = 100000;
+
+		  void initialize(void* param)
+		  {
+			  _group = *(job_id*)param;
+
+			  for(size_t i = 0; i < counter; ++ i)
+			  {
+				  GroupJob::create(service(),&_group);
+			  }
+
+			  start_timer(1000);
+		  }
+
+		  void timeout()
+		  {
+			  lemon::timer_t timer;
+
+			  send(_group,mutable_buffer());
+
+			  time_duration duration = timer.duration();
+
+			  std::cout << "multicast send(" << counter << ") -- success(" 
+				  
+				  << duration / 10000000 << "." 
+
+				  << std::setw(6) << std::setfill('0') <<(duration % 10000000) / 10 
+
+				  << " s)" << std::endl;
+
+			  std::cout << "group job counter(" << jobs(service()) << ")" << std::endl;
+
+			  if(jobs(service()) == 1)  exit();
+			 
+		  }
+
+
+	  private:
+
+		  job_id _group; 
+	  };
+
+
+
+	 LEMON_UNITTEST_CASE(RunQUnittest,GroupTest)
+	 {
+		 runQ_service Q;
+
+		 job_id group = create_group(Q);
+
+		 LEMON_CHECK(LEMON_JOBID_IS_MULTICAST(group));
+
+		 GroupServer::create(Q,&group);
+
+		 Q.run();
 	 }
 
 	class ResetJob : public basic_job_class<ResetJob>
@@ -210,18 +298,20 @@ namespace lemon{namespace runQ{namespace test{
 
 		iTaxi():counter(0){}
 
-		void initialize(void*)
+		void initialize(void* param)
 		{
+			entry_group(*(job_id*)param);
+
 			start_timer(1000);
 		}
 
-		void recv(lemon_job_id source, mutable_buffer buff)
+		void multicast(lemon_job_id source, const_buffer buff)
 		{
 			maxCounter = buffer_cast<size_t>(buff);
 
-			buffer_cast<size_t>(buff) = counter ++;
+			send(source, mutable_buffer());
 
-			send(source,buff);
+			++ counter;
 
 			_timer.reset();
 		}
@@ -258,9 +348,9 @@ namespace lemon{namespace runQ{namespace test{
 	{
 	public:
 
-		const static int maxLoop = 100;
+		const static int maxLoop = 10000;
 
-		const static int maxTaxis = 300000;
+		const static int maxTaxis = 1000000;
 
 		void initialize(void*)
 		{
@@ -268,11 +358,13 @@ namespace lemon{namespace runQ{namespace test{
 
 			_proxyCounter = 0;
 
+			_group = create_group();
+
 			lemon::timer_t timer;
 
 			for(size_t i =0; i < maxTaxis; ++ i)
 			{
-				_taxis.push_back(iTaxi::create(service()));
+				_taxis.push_back(iTaxi::create(service(),&_group));
 			}
 
 			time_duration duration = timer.duration();
@@ -288,19 +380,14 @@ namespace lemon{namespace runQ{namespace test{
 			beat();
 		}
 
-		void recv(lemon_job_id id, mutable_buffer buff)
+		void recv(lemon_job_id , mutable_buffer)
 		{
 			++ _responses;
 
-			id;
-
-			LEMON_CHECK(buffer_cast<size_t>(buff) == _loop);
-
-			free(buff);
+			//free(buf);
 
 			if(_taxis.size() == _responses)
 			{
-
 				time_duration duration = _timer.duration();
 
 				std::cout << "recv taxi heart beat (" << _responses << ")" 
@@ -327,16 +414,11 @@ namespace lemon{namespace runQ{namespace test{
 		{
 			lemon::timer_t timer;
 
-			std::vector<job_id>::const_iterator iter,end = _taxis.end();
+			mutable_buffer buffer = alloc(24);
 
-			for(iter = _taxis.begin(); iter != end; ++ iter)
-			{
-				mutable_buffer buffer = alloc(24);
+			buffer_cast<size_t>(buffer) = maxLoop;
 
-				buffer_cast<size_t>(buffer) = maxLoop;
-
-				send(*iter,buffer);
-			}
+			send(_group,buffer);
 
 			_responses = 0;
 
@@ -378,6 +460,8 @@ namespace lemon{namespace runQ{namespace test{
 		std::vector<job_id>										_taxis;
 
 		size_t													_proxyCounter;
+
+		job_id													_group;
 	};
 
 	LEMON_UNITTEST_CASE(RunQUnittest,iTaxiGatewayTest)
@@ -388,7 +472,7 @@ namespace lemon{namespace runQ{namespace test{
 
 		Q.proxy(iTaxiGateway::create(Q));
 
-		thread_group works(lemon::bind(&runQ_service::run,&Q),2);
+		thread_group works(lemon::bind(&runQ_service::run,&Q),4);
 
 		works.join();
 
