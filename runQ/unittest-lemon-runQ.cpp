@@ -348,7 +348,7 @@ namespace lemon{namespace runQ{namespace test{
 	{
 	public:
 
-		const static int maxLoop = 10;
+		const static int maxLoop = 100;
 
 		const static int maxTaxis = 100000;
 
