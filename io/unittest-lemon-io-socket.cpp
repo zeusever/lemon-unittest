@@ -82,6 +82,24 @@ namespace lemon{namespace io{namespace test{
 		LEMON_UNITTEST_EXPECT_EXCEPTION(c.send(lemon::cbuf(message)),lemon::error_info);
 	}
 
+	void udp_async_send(io_service & service,size_t,const LemonErrorInfo &)
+	{
+		service.stop();
+	}
+
+	LEMON_UNITTEST_CASE(SocketUnittest,UDPAsyncSendTest)
+	{
+		lemon::net::endpoint ep(lemon::net::resolver_iterator("127.0.0.1","1812")->ai_addr);
+
+		io_service service;
+
+		ip::udp::socket socket(ep.af(),service);
+
+		socket.async_sendto(lemon::cbuf("test"),ep,lemon::bind(udp_async_send,lemon::ref(service),lemon::_0,lemon::_1));
+
+		service.dispatch();
+	}
+
 	LEMON_UNITTEST_CASE(SocketUnittest,SocketShutDownTest)
 	{
 		io_service service;

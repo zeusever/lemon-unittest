@@ -69,7 +69,7 @@ namespace lemon{namespace runQ{namespace test{
 
 			  for(size_t i = 0; i < counter; ++ i)
 			  {
-				  GroupJob::create(service(),&_group);
+				  GroupJob::create(runQ(),&_group);
 			  }
 
 			  start_timer(1000);
@@ -91,9 +91,9 @@ namespace lemon{namespace runQ{namespace test{
 
 				  << " s)" << std::endl;
 
-			  std::cout << "group job counter(" << jobs(service()) << ")" << std::endl;
+			  std::cout << "group job counter(" << jobs(runQ()) << ")" << std::endl;
 
-			  if(jobs(service()) == 1)  exit();
+			  if(jobs(runQ()) == 1)  exit();
 			 
 		  }
 
@@ -242,7 +242,7 @@ namespace lemon{namespace runQ{namespace test{
 		 {
 			 for(size_t i =0; i < 1000; ++ i)
 			 {
-				 _taxis.push_back(TimerCloseJob::create(service()));
+				 _taxis.push_back(TimerCloseJob::create(runQ()));
 			 }
 
 			 start_timer(1000);
@@ -250,9 +250,9 @@ namespace lemon{namespace runQ{namespace test{
 
 		 void timeout()
 		 {
-			 std::cout << "taxi counter :" << jobs(service()) << std::endl;
+			 std::cout << "taxi counter :" << jobs(runQ()) << std::endl;
 
-			 if(jobs(service()) == 1){ exit(); return;}
+			 if(jobs(runQ()) == 1){ exit(); return;}
 
 			 std::vector<job_id>::const_iterator iter,end = _taxis.end();
 
@@ -364,7 +364,7 @@ namespace lemon{namespace runQ{namespace test{
 
 			for(size_t i =0; i < maxTaxis; ++ i)
 			{
-				_taxis.push_back(iTaxi::create(service(),&_group));
+				_taxis.push_back(iTaxi::create(runQ(),&_group));
 			}
 
 			time_duration duration = timer.duration();
@@ -437,7 +437,7 @@ namespace lemon{namespace runQ{namespace test{
 
 		void timeout()
 		{
-			std::cout << "taxi counter :" << jobs(service()) << std::endl;
+			std::cout << "taxi counter :" << jobs(runQ()) << std::endl;
 
 			if(_proxyCounter == maxTaxis) exit();
 		}
